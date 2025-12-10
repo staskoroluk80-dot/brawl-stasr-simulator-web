@@ -79,8 +79,24 @@
             align-items: center;
             font-weight: 700;
         }
-        .icon-img { width: 22px; margin-right: 5px; }
-        .chat-btn { width: 40px; height: 40px; background: #555; border-radius: 50%; border: 2px solid #fff; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 20px;}
+        .icon-img { 
+            width: 22px; 
+            height: 22px;
+            margin-right: 5px; 
+            object-fit: contain;
+        }
+        .chat-btn { 
+            width: 40px; 
+            height: 40px; 
+            background: #555; 
+            border-radius: 50%; 
+            border: 2px solid #fff; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            cursor: pointer; 
+            font-size: 20px;
+        }
 
         /* ЕКРАН 1: ГОЛОВНИЙ */
         #home-screen {
@@ -98,7 +114,16 @@
             align-items: center;
             gap: 10px;
         }
-        .avatar { width: 40px; height: 40px; background: #555; border: 2px solid #fff; border-radius: 5px; }
+        .avatar { 
+            width: 40px; 
+            height: 40px; 
+            background: #555; 
+            border: 2px solid #fff; 
+            border-radius: 5px; 
+            background-image: url('https://cdn-icons-png.flaticon.com/512/3135/3135715.png');
+            background-size: cover;
+            background-position: center;
+        }
         .username { font-size: 20px; font-weight: 900; text-shadow: 2px 2px 0 #000; }
         .trophies { background: rgba(0,0,0,0.4); padding: 5px 12px; border-radius: 15px; font-weight: 700; font-size: 14px; }
 
@@ -207,7 +232,18 @@
             align-items: center;
             position: relative;
         }
-        .small-btn { width: 45px; height: 45px; background: #555; border: 2px solid #fff; border-radius: 8px; margin-bottom: 5px; }
+        .small-btn { 
+            width: 45px; 
+            height: 45px; 
+            background: #555; 
+            border: 2px solid #fff; 
+            border-radius: 8px; 
+            margin-bottom: 5px; 
+            background-image: url('https://cdn-icons-png.flaticon.com/512/860/860829.png');
+            background-size: 60%;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
         .action-btn {
             width: 85%;
             padding: 12px 0;
@@ -314,8 +350,14 @@
             border-radius: 8px;
             border: 2px solid transparent; 
         }
-        .box-blue { border-color: #8e44ad; } 
-        .box-green { border-color: #2ecc71; }
+        .box-blue { 
+            border-color: #8e44ad; 
+            background: linear-gradient(to bottom, #9b59b6, #8e44ad);
+        }
+        .box-green { 
+            border-color: #2ecc71; 
+            background: linear-gradient(to bottom, #2ecc71, #27ae60);
+        }
         .box-pic {
             width: 90%;
             height: auto;
@@ -375,6 +417,7 @@
             text-transform: uppercase;
             box-shadow: 0 6px 0 #cca300;
             cursor: pointer;
+            transition: all 0.1s;
         }
         .btn-play:active {
             box-shadow: 0 2px 0 #cca300;
@@ -560,10 +603,10 @@
             
             <div class="currency-section">
                 <div class="currency-pill">
-                    <img src="coin.png" alt="C" class="icon-img"> 100
+                    <img src="https://cdn-icons-png.flaticon.com/512/2582/2582635.png" alt="Coins" class="icon-img"> 100
                 </div>
                 <div class="currency-pill">
-                    <span style="color:#00ff00; font-size: 18px; margin-right:5px;">💎</span> 0
+                    <img src="https://cdn-icons-png.flaticon.com/512/2582/2582675.png" alt="Gems" class="icon-img"> 0
                 </div>
                 <div class="chat-btn" onclick="toggleChat()">💬</div>
             </div>
@@ -594,7 +637,7 @@
 
             <div class="brawler-display">
                 <div class="rank-info">Rank 1 &nbsp;|&nbsp; Power 1</div>
-                <img src="https://cdn.7tv.app/emote/648ffe5aef0e2f8181baa2f9/4x.png" alt="Lou" class="character-img"> 
+                <img src="https://static.wikia.nocookie.net/brawlstars/images/2/28/Lou_Portrait.png" alt="Lou" class="character-img"> 
             </div>
         </section>
 
@@ -667,10 +710,10 @@
             
             <div class="currency-section">
                 <div class="currency-pill">
-                    <img src="coin.png" alt="C" class="icon-img"> 156
+                    <img src="https://cdn-icons-png.flaticon.com/512/2582/2582635.png" alt="Coins" class="icon-img"> 156
                 </div>
                 <div class="currency-pill">
-                    <span style="color:#00ff00; font-size: 18px; margin-right:5px;">💎</span> 0
+                    <img src="https://cdn-icons-png.flaticon.com/512/2582/2582675.png" alt="Gems" class="icon-img"> 0
                 </div>
                 <div class="chat-btn" onclick="toggleChat()">💬</div>
             </div>
@@ -687,7 +730,9 @@
                     <div class="info-i">i</div>
                 </div>
                 <div class="card-map">Flooded Mine</div>
-                <div class="card-bg-image">💎</div>
+                <div class="card-bg-image">
+                    <img src="https://static.wikia.nocookie.net/brawlstars/images/6/63/Gem_Grab.png" alt="Gem Grab" style="width: 80px; height: 80px; opacity: 0.5;">
+                </div>
             </div>
 
             <div class="event-card card-green">
@@ -699,7 +744,9 @@
                     <div class="info-i">i</div>
                 </div>
                 <div class="card-map">Skull Creek</div>
-                <div class="card-bg-image">💀</div>
+                <div class="card-bg-image">
+                    <img src="https://static.wikia.nocookie.net/brawlstars/images/e/ed/Showdown.png" alt="Showdown" style="width: 80px; height: 80px; opacity: 0.5;">
+                </div>
             </div>
 
             <div class="event-card card-locked">
@@ -738,7 +785,7 @@
 
         // --- ЛОГІКА SOCKET.IO ---
         
-        // 🎯 ОНОВЛЕНИЙ URL СЕРВЕРА - ваш Replit
+        // 🎯 URL СЕРВЕРА - ваш Replit
         const SERVER_URL = 'http://e1880d92-f3a7-4ff5-b154-3e018a98f04c-00-obyt5ltn3xal.kirk.replit.dev';
         
         const socket = io(SERVER_URL, {
@@ -766,7 +813,7 @@
         // ПІДКЛЮЧЕННЯ ТА ЛОГІН
         socket.on('connect', () => {
             console.log('✅ Підключено до сервера:', SERVER_URL);
-            addChatMessage('SYSTEM', `Підключено до сервера ${SERVER_URL}`, true);
+            addChatMessage('SYSTEM', `Підключено до сервера`, true);
             addChatMessage('SYSTEM', `Спроба входу як: ${currentUsername}...`, true);
             
             // Затримка перед логіном
@@ -782,7 +829,7 @@
 
         socket.on('connect_error', (error) => {
             console.error('❌ Помилка підключення:', error);
-            addChatMessage('SYSTEM', `❌ Помилка: ${error.message || 'Невідома помилка'}`, true);
+            addChatMessage('SYSTEM', `❌ Помилка підключення`, true);
             
             // Спроба повторного підключення
             setTimeout(() => {
@@ -794,15 +841,19 @@
             addChatMessage('SYSTEM', `✅ Успішний вхід! Ласкаво просимо, ${username}!`, true);
             document.getElementById('display-username').textContent = username;
             currentUsername = username;
+            
+            // Зміна аватара при успішному вході
+            document.querySelector('.avatar').style.backgroundImage = 
+                `url('https://cdn-icons-png.flaticon.com/512/3135/3135715.png')`;
         });
 
         socket.on('loginError', (message) => {
-            addChatMessage('SYSTEM', `❌ ПОМИЛКА ВХОДУ: ${message}`, true);
+            addChatMessage('SYSTEM', `❌ ПОМИЛКА: ${message}`, true);
             
             // Автоматична зміна імені при конфлікті
             if (message.includes('зайняте')) {
                 const newUsername = currentUsername + Math.floor(Math.random() * 100);
-                addChatMessage('SYSTEM', `🔄 Автоматична зміна імені на: ${newUsername}`, true);
+                addChatMessage('SYSTEM', `🔄 Зміна імені на: ${newUsername}`, true);
                 setTimeout(() => {
                     socket.emit('login', newUsername);
                 }, 1500);
@@ -837,7 +888,10 @@
             otherPlayers.forEach(player => {
                 const li = document.createElement('li');
                 li.innerHTML = `
-                    <span>👤 ${player}</span>
+                    <span style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 20px; height: 20px; border-radius: 50%; background: #3498db;"></div>
+                        ${player}
+                    </span>
                     <button onclick="sendInviteTo('${player}')">Запросити</button>
                 `;
                 playerListOutput.appendChild(li);
@@ -856,10 +910,9 @@
         }
 
         socket.on('receiveInvite', (data) => {
-            const accept = confirm(`🎮 Ви отримали запрошення від ${data.senderName}\n\nПрийняти запрошення?`);
+            const accept = confirm(`🎮 Запрошення від ${data.senderName}\n\nПрийняти?`);
             if (accept) {
                 addChatMessage('SYSTEM', `✅ Запрошення від ${data.senderName} прийнято!`, true);
-                // Тут можна додати логіку прийняття запрошення
                 socket.emit('acceptInvite', data.senderId);
             } else {
                  addChatMessage('SYSTEM', `❌ Запрошення від ${data.senderName} відхилено`, true);
@@ -868,12 +921,14 @@
         
         socket.on('inviteAccepted', (data) => {
             addChatMessage('SYSTEM', `✅ ${data.acceptorName} прийняв ваше запрошення!`, true);
-            alert(`🎉 ${data.acceptorName} прийняв ваше запрошення!`);
         });
         
         socket.on('playerUpdate', (count) => {
-            // Можна використовувати для відображення загальної кількості онлайн
-            console.log('Онлайн гравців:', count);
+            // Оновити індикатор онлайн
+            const onlineIndicator = document.querySelector('.chat-btn');
+            if (onlineIndicator) {
+                onlineIndicator.title = `Онлайн: ${count} гравців`;
+            }
         });
 
         // Встановлюємо початковий екран
@@ -895,7 +950,19 @@
             }
         });
         
-        // Функція для тесту підключення
+        // Кнопка Play
+        document.querySelector('.btn-play').addEventListener('click', function() {
+            this.style.transform = 'translateY(4px)';
+            this.style.boxShadow = '0 2px 0 #cca300';
+            
+            setTimeout(() => {
+                this.style.transform = '';
+                this.style.boxShadow = '0 6px 0 #cca300';
+                addChatMessage('SYSTEM', '🎮 Пошук гри...', true);
+            }, 100);
+        });
+        
+        // Тест підключення
         window.testConnection = function() {
             console.log('Тест підключення до:', SERVER_URL);
             addChatMessage('SYSTEM', '🔍 Тест підключення...', true);
@@ -903,8 +970,7 @@
             if (socket.connected) {
                 addChatMessage('SYSTEM', '✅ З\'єднання активно', true);
             } else {
-                addChatMessage('SYSTEM', '❌ Немає з\'єднання. Перепідключення...', true);
-                socket.connect();
+                addChatMessage('SYSTEM', '❌ Немає з\'єднання', true);
             }
         };
         
