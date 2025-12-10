@@ -1,1 +1,1 @@
-# brawl-stasr-simulator-web
+# brawl-stars-simulator-web

@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brawl Stars 2018 - Home and Events (Combined)</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:700,900&display=swap" rel="stylesheet">
+    <style>
+        /* --- ЗМІННІ (КОЛЬОРИ) --- */
+        :root {
+            --bg-blue-dark: #0d4474;
+            --bg-blue-light: #1f78b4;
+            --gold: #ffc400;
+            --white: #ffffff;
+            --black: #000000;
+            --gray-panel: #2a2a2a;
+            --btn-red: #e74c3c;
+            --btn-green: #2ecc71;
+            --btn-purple: #9b59b6;
+            --btn-blue: #3498db;
+            --btn-orange: #e67e22;
+            --event-purple: #8e44ad;
+            --event-green: #2ecc71;
+            --locked-gray: #3e3e3e;
+            --back-button-color: #5d5d5d;
+            --chat-bg: rgba(0,0,0,0.6);
+            --chat-input: #444;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-blue-dark);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .screen-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none;
+            background: linear-gradient(135deg, var(--bg-blue-light), var(--bg-blue-dark) 80%);
+        }
+        .screen-container.active { display: grid; }
+        
+        .header-common {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            color: var(--white);
+            height: 60px;
+        }
+        .currency-section {
+            display: flex;
+            gap: 15px;
+        }
+        .currency-pill {
+            background: rgba(0,0,0,0.4);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 15px;
+            padding: 4px 12px;
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+        }
+        .icon-img { width: 22px; margin-right: 5px; }
+        .chat-btn { width: 40px; height: 40px; background: #555; border-radius: 50%; border: 2px solid #fff; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 20px;}
+
+        /* ЕКРАН 1: ГОЛОВНИЙ */
+        #home-screen {
+            grid-template-areas: 
+                "header header header"
+                "left center right"
+                "footer footer footer";
+            grid-template-rows: 60px 1fr 150px;
+            grid-template-columns: 110px 1fr 200px;
+        }
+
+        #home-screen .header-common { grid-area: header; }
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .avatar { width: 40px; height: 40px; background: #555; border: 2px solid #fff; border-radius: 5px; }
+        .username { font-size: 20px; font-weight: 900; text-shadow: 2px 2px 0 #000; }
+        .trophies { background: rgba(0,0,0,0.4); padding: 5px 12px; border-radius: 15px; font-weight: 700; font-size: 14px; }
+
+        /* Left Menu */
+        .left-menu {
+            grid-area: left;
+            background: rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding-top: 30px;
+            align-items: center;
+        }
+        .menu-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--white);
+            font-size: 11px;
+            font-weight: 800;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .btn-box {
+            width: 65px; height: 60px;
+            border: 3px solid #fff;
+            border-radius: 12px;
+            margin-bottom: 5px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 24px;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.5);
+        }
+        .color-red { background-color: var(--btn-red); }
+        .color-green { background-color: var(--btn-green); }
+        .color-purple { background-color: var(--btn-purple); }
+        .notification {
+            position: absolute; top: -5px; right: -5px;
+            background: var(--btn-red); color: white;
+            border: 2px solid white; border-radius: 50%;
+            width: 20px; height: 20px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 12px; z-index: 2;
+        }
+
+        /* Center (Character) */
+        .center-area {
+            grid-area: center;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0) 70%);
+        }
+        .brawler-display {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .rank-info {
+            position: absolute;
+            top: -40px; 
+            background: rgba(0,0,0,0.6);
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            padding: 5px 15px;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 14px;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 0 #000;
+            z-index: 2;
+        }
+        .character-img {
+            height: 380px; 
+            width: auto;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6));
+            z-index: 1;
+        }
+        .plus-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px; height: 50px;
+            border: 3px solid #fff;
+            border-radius: 15px;
+            background: rgba(0,0,0,0.2);
+            color: white;
+            font-size: 35px;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer;
+        }
+        .pos-left { left: 15%; }
+        .pos-right { right: 15%; }
+
+        /* Right Menu */
+        .right-menu {
+            grid-area: right;
+            background: rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding-top: 30px;
+            align-items: center;
+            position: relative;
+        }
+        .small-btn { width: 45px; height: 45px; background: #555; border: 2px solid #fff; border-radius: 8px; margin-bottom: 5px; }
+        .action-btn {
+            width: 85%;
+            padding: 12px 0;
+            text-align: center;
+            color: white;
+            font-weight: 900;
+            font-size: 13px;
+            text-transform: uppercase;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.4);
+        }
+        .bg-blue { background-color: var(--btn-blue); }
+        .bg-orange { background-color: var(--btn-orange); }
+        
+        /* Соціальна панель */
+        #social-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 10;
+        }
+        #social-panel.active { display: flex; }
+
+        .panel-header {
+            font-size: 18px;
+            font-weight: 900;
+            text-transform: uppercase;
+            border-bottom: 2px solid #555;
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .close-panel-btn {
+            background: var(--btn-red);
+            border: none;
+            color: white;
+            padding: 3px 8px;
+            font-weight: 900;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        #player-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        #player-list li {
+            background: var(--gray-panel);
+            margin-bottom: 5px;
+            padding: 8px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        #player-list button {
+            background: var(--btn-green);
+            color: white;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        /* Footer */
+        .footer {
+            grid-area: footer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px 10px 20px;
+            background: rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .boxes-wrapper {
+            display: flex;
+            gap: 15px;
+        }
+        .box-item {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            border-radius: 8px;
+            border: 2px solid transparent; 
+        }
+        .box-blue { border-color: #8e44ad; } 
+        .box-green { border-color: #2ecc71; }
+        .box-pic {
+            width: 90%;
+            height: auto;
+            margin-bottom: 5px;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+        }
+        .box-counter {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .play-area {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-left: auto;
+        }
+        .event-slot {
+            width: 280px;
+            height: 70px;
+            background: linear-gradient(to bottom, #2a2a2a, #1a1a1a);
+            border: 2px solid #9b59b6;
+            border-radius: 8px;
+            padding: 5px 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .timer-text { color: var(--gold); font-size: 11px; text-transform: uppercase; margin-bottom: 2px; }
+        .mode-name { color: white; font-weight: 900; font-size: 18px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+        .map-name { color: #aaa; font-size: 12px; font-weight: 700; }
+        .info-icon { position: absolute; top: 5px; right: 5px; color: #3498db; font-weight: bold; font-family: serif; font-style: italic; border: 2px solid #3498db; border-radius: 50%; width: 20px; height: 20px; display: flex; justify-content: center; align-items: center; font-size: 12px;}
+        .play-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+        }
+        .ticket-count { color: white; font-size: 12px; font-weight: 700; text-shadow: 1px 1px 0 #000; }
+        .btn-play {
+            background-color: var(--gold);
+            color: black;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 40px;
+            font-size: 28px;
+            font-weight: 900;
+            text-transform: uppercase;
+            box-shadow: 0 6px 0 #cca300;
+            cursor: pointer;
+        }
+        .btn-play:active {
+            box-shadow: 0 2px 0 #cca300;
+            transform: translateY(4px);
+        }
+
+        /* ЧАТ */
+        #chat-window {
+            position: absolute;
+            bottom: 120px;
+            left: 20px;
+            width: 350px;
+            height: 200px;
+            background: var(--chat-bg);
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 10px;
+            display: none;
+            flex-direction: column;
+            z-index: 5;
+        }
+        #chat-window.active { display: flex; }
+
+        #chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            color: white;
+            font-size: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        #chat-input-wrapper {
+            display: flex;
+            gap: 5px;
+        }
+        #chat-input {
+            flex-grow: 1;
+            padding: 5px;
+            border: none;
+            border-radius: 5px;
+            background: var(--chat-input);
+            color: white;
+        }
+        #chat-send-btn {
+            background: var(--btn-blue);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* ЕКРАН 2: РЕЖИМИ */
+        #events-screen {
+            grid-template-rows: 70px 1fr;
+            grid-template-columns: 1fr;
+            grid-template-areas: 
+                "top"
+                "grid";
+        }
+        
+        .events-header {
+            grid-area: top;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            background: rgba(0,0,0,0.4);
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .back-btn {
+            background: var(--back-button-color);
+            color: white;
+            border: 2px solid #fff;
+            padding: 8px 20px;
+            font-weight: 900;
+            cursor: pointer;
+            border-radius: 5px;
+            box-shadow: 0 4px 0 #333;
+            margin-right: 20px;
+            text-transform: uppercase;
+            text-decoration: none; 
+        }
+        .back-btn:active { box-shadow: 0 0 0 #333; transform: translateY(4px); }
+        
+        .events-title {
+            color: #fff;
+            font-size: 24px;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 0 #000;
+            flex-grow: 1; 
+        }
+
+        /* Events Grid */
+        .events-grid {
+            grid-area: grid;
+            display: grid;
+            grid-template-columns: 1fr 1fr; 
+            grid-template-rows: 1fr 1fr;    
+            gap: 15px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .event-card {
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 6px 0 rgba(0,0,0,0.5);
+            border: 2px solid rgba(0,0,0,0.2);
+            cursor: pointer;
+            color: var(--white);
+        }
+        
+        .card-purple { background: var(--event-purple); }
+        .card-green { background: var(--event-green); }
+        .card-locked { 
+            background: var(--locked-gray); 
+            border: 3px solid #555;
+            justify-content: center; 
+            align-items: center; 
+            text-align: center;
+            opacity: 0.9;
+        }
+
+        .card-header {
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .mode-info h3 { margin: 0; font-size: 22px; color: #fff; text-transform: uppercase; text-shadow: 1px 1px 0 #000; }
+        .mode-info span { color: var(--gold); font-size: 12px; font-weight: 700; }
+        .info-i { 
+            width: 25px; height: 25px; 
+            border: 2px solid #fff; border-radius: 50%; 
+            color: #fff; font-weight: 900; 
+            display: flex; justify-content: center; align-items: center; 
+            font-size: 12px;
+        }
+
+        .card-map {
+            padding: 0 15px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .card-bg-image {
+            flex-grow: 1;
+            background-color: rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: rgba(255,255,255,0.2);
+            font-size: 40px;
+            min-height: 100px;
+        }
+
+        .lock-icon { font-size: 40px; margin-bottom: 10px; }
+        .locked-title { font-size: 20px; font-weight: 900; color: #fff; margin: 0; text-transform: uppercase; }
+        .locked-desc { font-size: 14px; max-width: 80%; }
+        .highlight { color: #3498db; font-weight: 900; }
+    </style>
+</head>
+<body>
+
+    <div id="home-screen" class="screen-container active">
+        
+        <header class="header-common">
+            <div class="profile-section">
+                <div class="avatar"></div>
+                <div class="username" id="display-username">TapGameplay</div>
+                <div class="trophies">🏆 0</div>
+            </div>
+            
+            <div class="currency-section">
+                <div class="currency-pill">
+                    <img src="coin.png" alt="C" class="icon-img"> 100
+                </div>
+                <div class="currency-pill">
+                    <span style="color:#00ff00; font-size: 18px; margin-right:5px;">💎</span> 0
+                </div>
+                <div class="chat-btn" onclick="toggleChat()">💬</div>
+            </div>
+        </header>
+
+        <nav class="left-menu">
+            <a href="#" class="menu-btn">
+                <div class="btn-box color-red">💀</div>
+                <div class="notification">1</div>
+                BRAWLERS
+            </a>
+            
+            <a href="shop.html" class="menu-btn"> 
+                <div class="btn-box color-green">🛒</div>
+                <div class="notification">1</div>
+                SHOP
+            </a>
+            
+            <a href="#" class="menu-btn" onclick="toggleSocialPanel()">
+                <div class="btn-box color-purple">👥</div>
+                SOCIAL
+            </a>
+        </nav>
+
+        <section class="center-area">
+            <div class="plus-btn pos-left">+</div>
+            <div class="plus-btn pos-right">+</div>
+
+            <div class="brawler-display">
+                <div class="rank-info">Rank 1 &nbsp;|&nbsp; Power 1</div>
+                <img src="https://cdn.7tv.app/emote/648ffe5aef0e2f8181baa2f9/4x.png" alt="Lou" class="character-img"> 
+            </div>
+        </section>
+
+        <aside class="right-menu">
+            <div id="social-panel">
+                <div class="panel-header">
+                    ONLINE PLAYERS
+                    <button class="close-panel-btn" onclick="toggleSocialPanel()">X</button>
+                </div>
+                <ul id="player-list">
+                    <li>Сервер очікує підключення...</li>
+                </ul>
+            </div>
+            
+            <div class="small-btn"></div>
+            <div class="small-btn"></div>
+            <div class="small-btn"></div>
+
+            <div class="action-btn bg-blue">Friendly<br>Game</div>
+            <div class="action-btn bg-orange">Create</div>
+        </aside>
+
+        <footer class="footer">
+            <div id="chat-window">
+                <div id="chat-messages">
+                    <div>[SERVER]: Очікування підключення до Socket.IO...</div>
+                </div>
+                <div id="chat-input-wrapper">
+                    <input type="text" id="chat-input" placeholder="Надіслати повідомлення..." onkeypress="if(event.key === 'Enter') document.getElementById('chat-send-btn').click();">
+                    <button id="chat-send-btn" onclick="sendChatMessage()">Send</button>
+                </div>
+            </div>
+
+            <div class="boxes-wrapper">
+                <div class="box-item box-green">
+                    <img src="https://static.wikia.nocookie.net/brawlstars/images/a/a0/Super_Brawl_Box.png" alt="Big Box" class="box-pic">
+                    <div class="box-counter">0/100</div>
+                </div>
+                <div class="box-item box-blue">
+                    <img src="https://static.wikia.nocookie.net/brawlstars/images/d/d3/Brawl_Box.png" alt="Box" class="box-pic">
+                    <div class="box-counter">0/10</div>
+                </div>
+            </div>
+
+            <div class="play-area">
+                <div class="event-slot" onclick="showScreen('events-screen')">
+                    <div class="info-icon">i</div>
+                    <div class="timer-text">New Event in: 23h 50m</div>
+                    <div class="mode-name">
+                        <span style="color:#d000ff;">💎</span> GEM GRAB
+                    </div>
+                    <div class="map-name">Flooded Mine</div>
+                </div>
+
+                <div class="play-wrapper">
+                    <div class="ticket-count">🎟️ 100/100</div>
+                    <button class="btn-play">Play</button>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+
+    <div id="events-screen" class="screen-container">
+        
+        <div class="events-header">
+            <button class="back-btn" onclick="showScreen('home-screen')">НАЗАД</button>
+            <div class="events-title">CHOOSE EVENT</div>
+            
+            <div class="currency-section">
+                <div class="currency-pill">
+                    <img src="coin.png" alt="C" class="icon-img"> 156
+                </div>
+                <div class="currency-pill">
+                    <span style="color:#00ff00; font-size: 18px; margin-right:5px;">💎</span> 0
+                </div>
+                <div class="chat-btn" onclick="toggleChat()">💬</div>
+            </div>
+        </div>
+
+        <div class="events-grid">
+            
+            <div class="event-card card-purple">
+                <div class="card-header">
+                    <div class="mode-info">
+                        <span>New Event in: 23h 37m</span>
+                        <h3>💎 GEM GRAB</h3>
+                    </div>
+                    <div class="info-i">i</div>
+                </div>
+                <div class="card-map">Flooded Mine</div>
+                <div class="card-bg-image">💎</div>
+            </div>
+
+            <div class="event-card card-green">
+                <div class="card-header">
+                    <div class="mode-info">
+                        <span>New Event in: 11h 37m</span>
+                        <h3>💀 SHOWDOWN</h3>
+                    </div>
+                    <div class="info-i">i</div>
+                </div>
+                <div class="card-map">Skull Creek</div>
+                <div class="card-bg-image">💀</div>
+            </div>
+
+            <div class="event-card card-locked">
+                <div class="lock-icon">🔒</div>
+                <h3 class="locked-title">Daily Events</h3>
+                <div class="locked-desc">Reach <span class="highlight">150</span> total Trophies to unlock</div>
+            </div>
+
+            <div class="event-card card-locked">
+                <div class="lock-icon">🔒</div>
+                <h3 class="locked-title">Special Events</h3>
+                <div class="locked-desc">Reach <span class="highlight">800</span> total Trophies to unlock</div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    <script>
+        // --- ЗАГАЛЬНІ ФУНКЦІЇ ІНТЕРФЕЙСУ ---
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen-container').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function toggleChat() {
+            document.getElementById('chat-window').classList.toggle('active');
+        }
+
+        function toggleSocialPanel() {
+            document.getElementById('social-panel').classList.toggle('active');
+        }
+
+        // --- ЛОГІКА SOCKET.IO ---
+        
+        // 🎯 ОНОВЛЕНИЙ URL СЕРВЕРА - ваш Replit
+        const SERVER_URL = 'http://e1880d92-f3a7-4ff5-b154-3e018a98f04c-00-obyt5ltn3xal.kirk.replit.dev';
+        
+        const socket = io(SERVER_URL, {
+            transports: ['websocket', 'polling'],
+            reconnection: true,
+            reconnectionAttempts: 5,
+            reconnectionDelay: 1000,
+            timeout: 10000
+        });
+        
+        let currentUsername = document.getElementById('display-username').textContent;
+        const chatOutput = document.getElementById('chat-messages'); 
+        const playerListOutput = document.getElementById('player-list');
+        const chatInput = document.getElementById('chat-input');
+        
+        function addChatMessage(user, text, isSystem = false) {
+            const messageElement = document.createElement('div');
+            messageElement.innerHTML = isSystem 
+                ? `<strong style="color:var(--gold);">[${user}]:</strong> ${text}`
+                : `[${user}]: ${text}`;
+            chatOutput.appendChild(messageElement);
+            chatOutput.scrollTop = chatOutput.scrollHeight; 
+        }
+
+        // ПІДКЛЮЧЕННЯ ТА ЛОГІН
+        socket.on('connect', () => {
+            console.log('✅ Підключено до сервера:', SERVER_URL);
+            addChatMessage('SYSTEM', `Підключено до сервера ${SERVER_URL}`, true);
+            addChatMessage('SYSTEM', `Спроба входу як: ${currentUsername}...`, true);
+            
+            // Затримка перед логіном
+            setTimeout(() => {
+                socket.emit('login', currentUsername);
+            }, 500);
+        });
+        
+        socket.on('disconnect', () => {
+            addChatMessage('SYSTEM', '❌ З\'єднання із сервером втрачено.', true);
+            playerListOutput.innerHTML = '<li>Сервер недоступний...</li>';
+        });
+
+        socket.on('connect_error', (error) => {
+            console.error('❌ Помилка підключення:', error);
+            addChatMessage('SYSTEM', `❌ Помилка: ${error.message || 'Невідома помилка'}`, true);
+            
+            // Спроба повторного підключення
+            setTimeout(() => {
+                addChatMessage('SYSTEM', '🔄 Спроба перепідключення...', true);
+            }, 3000);
+        });
+
+        socket.on('loginSuccess', (username) => {
+            addChatMessage('SYSTEM', `✅ Успішний вхід! Ласкаво просимо, ${username}!`, true);
+            document.getElementById('display-username').textContent = username;
+            currentUsername = username;
+        });
+
+        socket.on('loginError', (message) => {
+            addChatMessage('SYSTEM', `❌ ПОМИЛКА ВХОДУ: ${message}`, true);
+            
+            // Автоматична зміна імені при конфлікті
+            if (message.includes('зайняте')) {
+                const newUsername = currentUsername + Math.floor(Math.random() * 100);
+                addChatMessage('SYSTEM', `🔄 Автоматична зміна імені на: ${newUsername}`, true);
+                setTimeout(() => {
+                    socket.emit('login', newUsername);
+                }, 1500);
+            }
+        });
+
+        // ЧАТ
+        socket.on('chatMessage', (data) => {
+            addChatMessage(data.user, data.text);
+        });
+
+        function sendChatMessage() {
+            const text = chatInput.value;
+            if (currentUsername && text.trim()) {
+                socket.emit('sendMessage', text.trim());
+                addChatMessage(currentUsername, text.trim()); // Локальне відображення
+                chatInput.value = '';
+            }
+        }
+        
+        // СПИСОК ГРАВЦІВ / ІНВАЙТИ
+        socket.on('updatePlayerList', (players) => {
+            playerListOutput.innerHTML = '';
+            
+            const otherPlayers = players.filter(player => player !== currentUsername);
+            
+            if (otherPlayers.length === 0) {
+                 playerListOutput.innerHTML = '<li>🕐 Очікування інших гравців...</li>';
+                 return;
+            }
+
+            otherPlayers.forEach(player => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>👤 ${player}</span>
+                    <button onclick="sendInviteTo('${player}')">Запросити</button>
+                `;
+                playerListOutput.appendChild(li);
+            });
+            
+            // Оновити заголовок
+            const panelHeader = document.querySelector('.panel-header');
+            if (panelHeader) {
+                panelHeader.innerHTML = `ONLINE PLAYERS (${otherPlayers.length}) <button class="close-panel-btn" onclick="toggleSocialPanel()">X</button>`;
+            }
+        });
+
+        function sendInviteTo(targetUsername) {
+            socket.emit('sendInvite', targetUsername);
+            addChatMessage('SYSTEM', `📨 Запрошення надіслано гравцю ${targetUsername}`, true);
+        }
+
+        socket.on('receiveInvite', (data) => {
+            const accept = confirm(`🎮 Ви отримали запрошення від ${data.senderName}\n\nПрийняти запрошення?`);
+            if (accept) {
+                addChatMessage('SYSTEM', `✅ Запрошення від ${data.senderName} прийнято!`, true);
+                // Тут можна додати логіку прийняття запрошення
+                socket.emit('acceptInvite', data.senderId);
+            } else {
+                 addChatMessage('SYSTEM', `❌ Запрошення від ${data.senderName} відхилено`, true);
+            }
+        });
+        
+        socket.on('inviteAccepted', (data) => {
+            addChatMessage('SYSTEM', `✅ ${data.acceptorName} прийняв ваше запрошення!`, true);
+            alert(`🎉 ${data.acceptorName} прийняв ваше запрошення!`);
+        });
+        
+        socket.on('playerUpdate', (count) => {
+            // Можна використовувати для відображення загальної кількості онлайн
+            console.log('Онлайн гравців:', count);
+        });
+
+        // Встановлюємо початковий екран
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!document.querySelector('.screen-container.active')) {
+                showScreen('home-screen');
+            }
+            
+            // Автоматично відкрити чат при завантаженні
+            setTimeout(() => {
+                document.getElementById('chat-window').classList.add('active');
+            }, 1000);
+        });
+        
+        // Додаткові функції для чату
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendChatMessage();
+            }
+        });
+        
+        // Функція для тесту підключення
+        window.testConnection = function() {
+            console.log('Тест підключення до:', SERVER_URL);
+            addChatMessage('SYSTEM', '🔍 Тест підключення...', true);
+            
+            if (socket.connected) {
+                addChatMessage('SYSTEM', '✅ З\'єднання активно', true);
+            } else {
+                addChatMessage('SYSTEM', '❌ Немає з\'єднання. Перепідключення...', true);
+                socket.connect();
+            }
+        };
+        
+        // Автоматичний тест при завантаженні
+        setTimeout(window.testConnection, 2000);
+    </script>
+
+</body>
+</html>

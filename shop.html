@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brawl Stars Shop 2018</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:700,900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-blue: #0d4474;
+            --panel-blue: #145ecf; /* Яскравіший синій для фону магазину */
+            --header-bg: rgba(0,0,0,0.4);
+            --offer-purple: #9013fe;
+            --card-bg: #222;
+            --pp-pink: #d0021b; /* Рожевий для очок сили */
+            --free-green: #417505;
+            --price-btn: #ffffff;
+            --gold: #ffc400;
+            --font-main: 'Montserrat', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-blue);
+            font-family: var(--font-main);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .shop-container {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e5799 0%, #0d4474 100%);
+            display: grid;
+            grid-template-rows: 60px 1fr;
+        }
+
+        /* --- HEADER --- */
+        .shop-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            background-color: var(--header-bg);
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .back-btn {
+            background: #444;
+            border: 2px solid #fff;
+            padding: 5px 15px;
+            color: white;
+            text-decoration: none;
+            font-weight: 900;
+            border-radius: 5px;
+            font-size: 20px; /* Стрілочка */
+            cursor: pointer;
+        }
+
+        .shop-title {
+            font-size: 24px;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 0 #000;
+            margin-left: 10px;
+        }
+
+        .currency-bar {
+            display: flex;
+            gap: 15px;
+        }
+
+        .currency-item {
+            background: rgba(0,0,0,0.4);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 5px 15px;
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            color: white;
+        }
+
+        .coin-img { width: 20px; margin-right: 5px; }
+        
+        /* Стиль для зображення кристалів */
+        .gem-img { width: 20px; margin-right: 5px; }
+
+
+        /* --- MAIN CONTENT --- */
+        .shop-content {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr; /* Ліва колонка менша, права більша */
+            gap: 20px;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        /* LEFT SIDE - SPECIAL OFFER */
+        .special-offer-section {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .section-header {
+            background: #d0021b; /* Червона стрічка */
+            color: white;
+            text-align: center;
+            font-weight: 900;
+            padding: 5px;
+            text-transform: uppercase;
+            border: 2px solid #000;
+            margin-bottom: -10px; /* Накладання */
+            z-index: 2;
+            width: 90%;
+            align-self: center;
+            transform: skew(-10deg);
+        }
+
+        .offer-card {
+            background-color: var(--offer-purple);
+            border: 3px solid #000;
+            border-radius: 10px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            position: relative;
+        }
+
+        .timer-badge {
+            background: #000;
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        .offer-title {
+            color: white;
+            text-align: center;
+            font-weight: 900;
+            font-size: 20px;
+            margin: 10px 0;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        .brawler-preview {
+            flex-grow: 1;
+            background: #6a00bf; /* Темніший фіолетовий */
+            width: 90%;
+            border: 2px solid #000;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        /* Заглушка для Джина, бо немає картинки */
+        .gene-placeholder {
+            font-size: 100px;
+        }
+        
+        /* Стиль для Пін Паку */
+        .pin-pack-image {
+            max-width: 100%;
+            height: auto;
+            max-height: 100%;
+        }
+
+        .price-tag {
+            background: white; /* Змінено на білий, як на старому UI для кнопок покупки */
+            color: black;
+            padding: 10px 30px;
+            font-weight: 900;
+            font-size: 20px;
+            border-radius: 5px;
+            border: 2px solid #ccc;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #999;
+        }
+        .price-tag:active { transform: translateY(4px); box-shadow: 0 0 0 #999; }
+        .old-price { text-decoration: line-through; color: red; font-size: 14px; margin-left: 10px; }
+
+        /* RIGHT SIDE - DAILY DEALS */
+        .daily-deals-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .daily-header {
+            display: flex;
+            justify-content: space-between;
+            background: #000;
+            color: white;
+            padding: 5px 15px;
+            font-weight: 900;
+            text-transform: uppercase;
+            border: 2px solid #333;
+            margin-bottom: 10px;
+        }
+
+        .deals-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 10px;
+            height: 100%;
+        }
+
+        .deal-card {
+            background-color: #2a2a2a; /* Темно-сірий */
+            border: 2px solid #000;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Power Points Header (Pink) */
+        .pp-header {
+            background: #d400d4; /* Рожевий */
+            color: white;
+            text-align: center;
+            font-weight: 900;
+            font-size: 12px;
+            padding: 2px;
+            text-transform: uppercase;
+            clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%);
+            height: 25px;
+            z-index: 2;
+        }
+
+        .deal-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: -10px;
+        }
+
+        .brawler-face {
+            width: 50px;
+            height: 50px;
+            background: #555;
+            border: 2px solid #000;
+            margin-bottom: 5px;
+        }
+        
+        .progress-bar {
+            width: 80%;
+            height: 10px;
+            background: #111;
+            border: 1px solid #555;
+            margin-bottom: 5px;
+        }
+        .progress-fill { background: #00e000; height: 100%; width: 50%; }
+        .progress-text { font-size: 10px; color: white; text-align: center; margin-top: -12px; position: relative; text-shadow: 1px 1px 0 #000; }
+
+        .deal-price {
+            background: white;
+            width: 100%;
+            text-align: center;
+            font-weight: 900;
+            padding: 5px 0;
+            cursor: pointer;
+            border-top: 2px solid #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .price-free { background: #49b508; color: white; text-transform: uppercase; }
+        
+        /* Mythic Card Special Style */
+        .mythic-card {
+            background: linear-gradient(to bottom, #ff4d4d, #990000);
+        }
+        .mythic-header {
+            color: white; text-align: center; font-weight: 900; margin-top: 5px; text-transform: uppercase;
+            text-shadow: 1px 1px 0 #000;
+        }
+        .skull-logo { font-size: 40px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="shop-container">
+        <div class="shop-header">
+            <div style="display: flex; align-items: center;">
+                <a href="index.html" class="back-btn">&#9668;</a> <span class="shop-title">Shop</span>
+            </div>
+            
+            <div class="currency-bar">
+                <div class="currency-item">
+                    <img src="coin.png" alt="C" class="coin-img">
+                    <span>100</span>
+                </div>
+                <div class="currency-item">
+                    <img src="gems.png" alt="G" class="gem-img">
+                    <span>364</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="shop-content">
+            
+            <div class="special-offer-section">
+                <div class="section-header">Спеціальна пропозиція</div>
+                <div class="offer-card">
+                    <div class="timer-badge">1d 23h 🕒</div>
+                    
+                    <div class="offer-title">
+                        SPECIAL OFFER<br>
+                        <span style="font-size: 30px;">PIN PACK</span>
+                    </div>
+
+                    <div class="brawler-preview">
+                        <img src="pin_pack.png" alt="Пін Пак" class="pin-pack-image">
+                    </div>
+
+                    <div class="price-tag">
+                        <img src="gems.png" alt="G" class="gem-img"> **50**
+                        <span class="old-price">**69**</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="daily-deals-section">
+                <div class="daily-header">
+                    <span>Daily Deals</span>
+                    <span style="font-size: 12px; color: var(--gold);">23h 53m 🕒</span>
+                </div>
+
+                <div class="deals-grid">
+                    <div class="deal-card">
+                        <div class="pp-header">Power Points ⚡9</div>
+                        <div class="deal-content">
+                            <div class="brawler-face" style="background-color: #d66;">🐻</div> <div class="progress-bar"><div class="progress-fill" style="width: 80%;"></div></div>
+                            <div class="progress-text">228/130</div>
+                        </div>
+                        <div class="deal-price price-free">Free</div>
+                    </div>
+
+                    <div class="deal-card mythic-card">
+                        <div style="background: red; color: white; font-weight: 900; text-align: center; font-size: 10px;">NEW</div>
+                        <div class="deal-content">
+                            <div class="skull-logo">💀</div>
+                            <div class="mythic-header">Mythic<br>Brawler</div>
+                        </div>
+                        <div class="deal-price">
+                            <img src="gems.png" alt="G" class="gem-img"> 350
+                        </div>
+                    </div>
+
+                    <div class="deal-card">
+                        <div class="pp-header">Power Points ⚡3</div>
+                        <div class="deal-content">
+                            <div class="brawler-face" style="background-color: #d88;">👩‍🔧</div> 
+                            <div class="progress-bar"><div class="progress-fill" style="width: 60%;"></div></div>
+                            <div class="progress-text">45/20</div>
+                        </div>
+                        <div class="deal-price">
+                            <img src="coin.png" class="coin-img" style="width: 15px;"> 6
+                        </div>
+                    </div>
+
+                    <div class="deal-card">
+                        <div class="pp-header">Power Points ⚡22</div>
+                        <div class="deal-content">
+                            <div class="brawler-face" style="background-color: #44d;">🤖</div>
+                            <div class="progress-bar"><div class="progress-fill" style="width: 40%;"></div></div>
+                            <div class="progress-text">67/80</div>
+                        </div>
+                        <div class="deal-price">
+                            <img src="coin.png" class="coin-img" style="width: 15px;"> 44
+                        </div>
+                    </div>
+
+                    <div class="deal-card">
+                        <div class="pp-header">Power Points ⚡18</div>
+                        <div class="deal-content">
+                            <div class="brawler-face" style="background-color: #444;">🛢️</div>
+                            <div class="progress-bar"><div class="progress-fill" style="width: 90%;"></div></div>
+                            <div class="progress-text">155/80</div>
+                        </div>
+                        <div class="deal-price">
+                            <img src="coin.png" class="coin-img" style="width: 15px;"> 36
+                        </div>
+                    </div>
+
+                    <div class="deal-card">
+                        <div class="pp-header">Power Points ⚡11</div>
+                        <div class="deal-content">
+                            <div class="brawler-face" style="background-color: #d6d;">🏴‍☠️</div>
+                            <div class="progress-bar"><div class="progress-fill" style="width: 10%;"></div></div>
+                            <div class="progress-text">9/20</div>
+                        </div>
+                        <div class="deal-price">
+                            <img src="coin.png" class="coin-img" style="width: 15px;"> 22
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
