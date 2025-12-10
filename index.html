@@ -683,7 +683,7 @@
                     <button class="close-panel-btn" onclick="toggleSocialPanel()">X</button>
                 </div>
                 <ul id="player-list">
-                    <li>Сервер очікує підключення...</li>
+                    <li>Підключення до сервера...</li>
                 </ul>
             </div>
             
@@ -698,10 +698,10 @@
         <footer class="footer">
             <div id="chat-window">
                 <div id="chat-messages">
-                    <div>[SERVER]: Очікування підключення до Socket.IO...</div>
+                    <div>[SERVER]: Ініціалізація з'єднання...</div>
                 </div>
                 <div id="chat-input-wrapper">
-                    <input type="text" id="chat-input" placeholder="Надіслати повідомлення..." onkeypress="if(event.key === 'Enter') document.getElementById('chat-send-btn').click();">
+                    <input type="text" id="chat-input" placeholder="Надіслати повідомлення..." onkeypress="if(event.key === 'Enter') sendChatMessage()">
                     <button id="chat-send-btn" onclick="sendChatMessage()">Send</button>
                 </div>
             </div>
@@ -735,7 +735,6 @@
         </footer>
 
     </div>
-
 
     <div id="events-screen" class="screen-container">
         
@@ -795,10 +794,11 @@
         </div>
     </div>
 
-
     <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
     <script>
-        // --- ЗАГАЛЬНІ ФУНКЦІЇ ІНТЕРФЕЙСУ ---
+        // ============================
+        // ОСНОВНІ ФУНКЦІЇ ІНТЕРФЕЙСУ
+        // ============================
         function showScreen(screenId) {
             document.querySelectorAll('.screen-container').forEach(screen => {
                 screen.classList.remove('active');
@@ -814,107 +814,205 @@
             document.getElementById('social-panel').classList.toggle('active');
         }
 
-        // --- ЛОГІКА SOCKET.IO ---
+        // ============================
+        // SOCKET.IO ПІДКЛЮЧЕННЯ
+        // ============================
         
-        // 🎯 URL СЕРВЕРА - ваш Replit
-        const SERVER_URL = 'http://e1880d92-f3a7-4ff5-b154-3e018a98f04c-00-obyt5ltn3xal.kirk.replit.dev';
+        // 🔴 ПРОБЛЕМА: Replit блокує звичайні підключення
+        // ✅ РІШЕННЯ: Використовуємо правильний формат URL
         
-        const socket = io(SERVER_URL, {
-            transports: ['websocket', 'polling'],
-            reconnection: true,
-            reconnectionAttempts: 5,
-            reconnectionDelay: 1000,
-            timeout: 10000
-        });
+        // ВАРІАНТ 1: HTTPS (основний)
+        const SERVER_URL = 'https://e1880d92-f3a7-4ff5-b154-3e018a98f04c-00-obyt5ltn3xal.kirk.replit.dev';
         
-        let currentUsername = document.getElementById('display-username').textContent;
+        // ВАРІАНТ 2: HTTP для тесту (якщо HTTPS не працює)
+        // const SERVER_URL = 'http://e1880d92-f3a7-4ff5-b154-3e018a98f04c-00-obyt5ltn3xal.kirk.replit.dev';
+        
+        // ВАРІАНТ 3: Якщо сервер на Replit не працює, використовуємо локальний режим
+        const USE_OFFLINE_MODE = false; // true - для тесту без сервера
+        
+        let socket = null;
+        let currentUsername = 'TapGameplay';
         const chatOutput = document.getElementById('chat-messages'); 
         const playerListOutput = document.getElementById('player-list');
         const chatInput = document.getElementById('chat-input');
+        let isConnected = false;
         
+        // Функція для додавання повідомлень в чат
         function addChatMessage(user, text, isSystem = false) {
             const messageElement = document.createElement('div');
-            messageElement.innerHTML = isSystem 
-                ? `<strong style="color:var(--gold);">[${user}]:</strong> ${text}`
-                : `[${user}]: ${text}`;
+            if (isSystem) {
+                messageElement.innerHTML = `<strong style="color:var(--gold);">[${user}]:</strong> ${text}`;
+            } else {
+                messageElement.innerHTML = `[${user}]: ${text}`;
+            }
             chatOutput.appendChild(messageElement);
-            chatOutput.scrollTop = chatOutput.scrollHeight; 
+            chatOutput.scrollTop = chatOutput.scrollHeight;
         }
 
-        // ПІДКЛЮЧЕННЯ ТА ЛОГІН
-        socket.on('connect', () => {
-            console.log('✅ Підключено до сервера:', SERVER_URL);
-            addChatMessage('SYSTEM', `Підключено до сервера`, true);
-            addChatMessage('SYSTEM', `Спроба входу як: ${currentUsername}...`, true);
-            
-            // Затримка перед логіном
-            setTimeout(() => {
-                socket.emit('login', currentUsername);
-            }, 500);
-        });
-        
-        socket.on('disconnect', () => {
-            addChatMessage('SYSTEM', '❌ З\'єднання із сервером втрачено.', true);
-            playerListOutput.innerHTML = '<li>Сервер недоступний...</li>';
-        });
-
-        socket.on('connect_error', (error) => {
-            console.error('❌ Помилка підключення:', error);
-            addChatMessage('SYSTEM', `❌ Помилка підключення`, true);
-            
-            // Спроба повторного підключення
-            setTimeout(() => {
-                addChatMessage('SYSTEM', '🔄 Спроба перепідключення...', true);
-            }, 3000);
-        });
-
-        socket.on('loginSuccess', (username) => {
-            addChatMessage('SYSTEM', `✅ Успішний вхід! Ласкаво просимо, ${username}!`, true);
-            document.getElementById('display-username').textContent = username;
-            currentUsername = username;
-            
-            // Оновити аватар
-            document.querySelector('.avatar').textContent = username.substring(0, 2).toUpperCase();
-        });
-
-        socket.on('loginError', (message) => {
-            addChatMessage('SYSTEM', `❌ ПОМИЛКА: ${message}`, true);
-            
-            // Автоматична зміна імені при конфлікті
-            if (message.includes('зайняте')) {
-                const newUsername = currentUsername + Math.floor(Math.random() * 100);
-                addChatMessage('SYSTEM', `🔄 Зміна імені на: ${newUsername}`, true);
-                setTimeout(() => {
-                    socket.emit('login', newUsername);
-                }, 1500);
-            }
-        });
-
-        // ЧАТ
-        socket.on('chatMessage', (data) => {
-            addChatMessage(data.user, data.text);
-        });
-
+        // Функція для відправки повідомлення
         function sendChatMessage() {
-            const text = chatInput.value;
-            if (currentUsername && text.trim()) {
-                socket.emit('sendMessage', text.trim());
-                addChatMessage(currentUsername, text.trim());
-                chatInput.value = '';
+            const text = chatInput.value.trim();
+            if (text === '') return;
+            
+            if (!isConnected) {
+                addChatMessage(currentUsername, text);
+                addChatMessage('SYSTEM', '⚠️ Повідомлення не відправлено (немає з\'єднання з сервером)', true);
+            } else {
+                socket.emit('sendMessage', text);
+                addChatMessage(currentUsername, text);
+            }
+            
+            chatInput.value = '';
+        }
+
+        // Функція для запрошення гравця
+        function sendInviteTo(targetUsername) {
+            if (!isConnected) {
+                addChatMessage('SYSTEM', `❌ Не можу запросити ${targetUsername} (немає з'єднання)`, true);
+                return;
+            }
+            socket.emit('sendInvite', targetUsername);
+            addChatMessage('SYSTEM', `📨 Запрошення надіслано ${targetUsername}`, true);
+        }
+
+        // ============================
+        // ІНІЦІАЛІЗАЦІЯ ПІДКЛЮЧЕННЯ
+        // ============================
+        function initializeConnection() {
+            console.log('🔄 Ініціалізація підключення...');
+            addChatMessage('SYSTEM', '🔄 Спроба підключення до сервера...', true);
+            
+            if (USE_OFFLINE_MODE) {
+                // Режим офлайн для тесту
+                console.log('📴 Режим офлайн (без сервера)');
+                addChatMessage('SYSTEM', '📴 Режим офлайн. Гра працює локально.', true);
+                simulateOfflineMode();
+                return;
+            }
+            
+            try {
+                // Налаштування Socket.IO
+                socket = io(SERVER_URL, {
+                    transports: ['websocket', 'polling'],
+                    reconnection: true,
+                    reconnectionAttempts: 5,
+                    reconnectionDelay: 2000,
+                    timeout: 10000,
+                    forceNew: false,
+                    withCredentials: false,
+                    extraHeaders: {
+                        'Access-Control-Allow-Origin': '*'
+                    }
+                });
+                
+                // Обробники подій
+                socket.on('connect', () => {
+                    console.log('✅ УСПІШНО ПІДКЛЮЧЕНО! Socket ID:', socket.id);
+                    isConnected = true;
+                    addChatMessage('SYSTEM', '✅ Успішно підключено до сервера!', true);
+                    
+                    // Автоматичний логін
+                    setTimeout(() => {
+                        socket.emit('login', currentUsername);
+                    }, 1000);
+                });
+                
+                socket.on('connect_error', (error) => {
+                    console.error('❌ ПОМИЛКА ПІДКЛЮЧЕННЯ:', error.message);
+                    isConnected = false;
+                    addChatMessage('SYSTEM', `❌ Помилка підключення: ${error.message}`, true);
+                    addChatMessage('SYSTEM', '🔄 Спробую ще раз через 3 секунди...', true);
+                    
+                    // Автоматична спроба перепідключення
+                    setTimeout(() => {
+                        if (!isConnected) {
+                            addChatMessage('SYSTEM', '🔄 Повторна спроба підключення...', true);
+                            socket.connect();
+                        }
+                    }, 3000);
+                });
+                
+                socket.on('disconnect', (reason) => {
+                    console.log('❌ ВІДКЛЮЧЕНО. Причина:', reason);
+                    isConnected = false;
+                    addChatMessage('SYSTEM', `❌ З'єднання розірвано: ${reason}`, true);
+                    playerListOutput.innerHTML = '<li>Сервер недоступний...</li>';
+                });
+                
+                socket.on('loginSuccess', (username) => {
+                    console.log('✅ Успішний вхід:', username);
+                    currentUsername = username;
+                    document.getElementById('display-username').textContent = username;
+                    addChatMessage('SYSTEM', `✅ Вітаємо, ${username}!`, true);
+                    document.querySelector('.avatar').textContent = username.substring(0, 2).toUpperCase();
+                });
+                
+                socket.on('loginError', (message) => {
+                    console.error('❌ Помилка входу:', message);
+                    addChatMessage('SYSTEM', `❌ Помилка входу: ${message}`, true);
+                    
+                    // Автоматична зміна імені при конфлікті
+                    if (message.includes('зайняте')) {
+                        const newUsername = currentUsername + Math.floor(Math.random() * 1000);
+                        addChatMessage('SYSTEM', `🔄 Змінюю ім'я на: ${newUsername}`, true);
+                        setTimeout(() => {
+                            socket.emit('login', newUsername);
+                        }, 2000);
+                    }
+                });
+                
+                socket.on('chatMessage', (data) => {
+                    console.log('💬 Повідомлення:', data);
+                    addChatMessage(data.user, data.text);
+                });
+                
+                socket.on('updatePlayerList', (players) => {
+                    console.log('👥 Оновлення списку гравців:', players);
+                    updatePlayerList(players);
+                });
+                
+                socket.on('receiveInvite', (data) => {
+                    console.log('📨 Отримано запрошення:', data);
+                    handleInvite(data);
+                });
+                
+                socket.on('playerUpdate', (count) => {
+                    console.log('👥 Кількість гравців:', count);
+                });
+                
+                // Тестувальне повідомлення через 2 секунди
+                setTimeout(() => {
+                    if (isConnected) {
+                        socket.emit('sendMessage', 'Привіт від ' + currentUsername);
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                console.error('❌ КРИТИЧНА ПОМИЛКА:', error);
+                addChatMessage('SYSTEM', '❌ Критична помилка ініціалізації', true);
+                simulateOfflineMode();
             }
         }
         
-        // СПИСОК ГРАВЦІВ / ІНВАЙТИ
-        socket.on('updatePlayerList', (players) => {
+        // ============================
+        // ДОДАТКОВІ ФУНКЦІЇ
+        // ============================
+        function updatePlayerList(players) {
             playerListOutput.innerHTML = '';
             
+            if (!players || players.length === 0) {
+                playerListOutput.innerHTML = '<li>👤 Немає інших гравців онлайн</li>';
+                return;
+            }
+            
+            // Фільтруємо себе зі списку
             const otherPlayers = players.filter(player => player !== currentUsername);
             
             if (otherPlayers.length === 0) {
-                 playerListOutput.innerHTML = '<li>🕐 Очікування інших гравців...</li>';
-                 return;
+                playerListOutput.innerHTML = '<li>👤 Ви один у грі</li>';
+                return;
             }
-
+            
             otherPlayers.forEach(player => {
                 const li = document.createElement('li');
                 li.innerHTML = `
@@ -929,50 +1027,101 @@
                 playerListOutput.appendChild(li);
             });
             
-            // Оновити заголовок
+            // Оновлюємо заголовок панелі
             const panelHeader = document.querySelector('.panel-header');
             if (panelHeader) {
                 panelHeader.innerHTML = `ONLINE PLAYERS (${otherPlayers.length}) <button class="close-panel-btn" onclick="toggleSocialPanel()">X</button>`;
             }
-        });
-
-        function sendInviteTo(targetUsername) {
-            socket.emit('sendInvite', targetUsername);
-            addChatMessage('SYSTEM', `📨 Запрошення надіслано гравцю ${targetUsername}`, true);
         }
-
-        socket.on('receiveInvite', (data) => {
-            const accept = confirm(`🎮 Запрошення від ${data.senderName}\n\nПрийняти?`);
+        
+        function handleInvite(data) {
+            const accept = confirm(`🎮 ${data.senderName} запрошує вас у гру!\n\nПрийняти запрошення?`);
             if (accept) {
-                addChatMessage('SYSTEM', `✅ Запрошення від ${data.senderName} прийнято!`, true);
-                socket.emit('acceptInvite', data.senderId);
+                addChatMessage('SYSTEM', `✅ Ви прийняли запрошення від ${data.senderName}`, true);
+                if (isConnected && socket) {
+                    socket.emit('acceptInvite', data.senderId);
+                }
             } else {
-                 addChatMessage('SYSTEM', `❌ Запрошення від ${data.senderName} відхилено`, true);
+                addChatMessage('SYSTEM', `❌ Ви відхилили запрошення від ${data.senderName}`, true);
             }
-        });
+        }
         
-        socket.on('inviteAccepted', (data) => {
-            addChatMessage('SYSTEM', `✅ ${data.acceptorName} прийняв ваше запрошення!`, true);
-        });
-        
-        socket.on('playerUpdate', (count) => {
-            // Оновити індикатор онлайн
-            const onlineIndicator = document.querySelector('.chat-btn');
-            if (onlineIndicator) {
-                onlineIndicator.title = `Онлайн: ${count} гравців`;
-            }
-        });
-
-        // Встановлюємо початковий екран
-        document.addEventListener('DOMContentLoaded', () => {
-            if (!document.querySelector('.screen-container.active')) {
-                showScreen('home-screen');
-            }
+        function simulateOfflineMode() {
+            // Симуляція офлайн режиму
+            addChatMessage('SYSTEM', '🎮 Гра працює в офлайн-режимі', true);
+            addChatMessage('SYSTEM', '👥 Для мультиплеєра потрібен сервер', true);
             
-            // Автоматично відкрити чат при завантаженні
+            // Симулюємо декілька гравців для тесту
+            const fakePlayers = ['Player1', 'Player2', 'Player3', 'BOT_Alpha', 'BOT_Beta'];
+            updatePlayerList(fakePlayers);
+            
+            // Симуляція автоматичних повідомлень
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    const randomPlayer = fakePlayers[Math.floor(Math.random() * fakePlayers.length)];
+                    const messages = [
+                        'Привіт усім!',
+                        'Хто грає?',
+                        'Давайте грати разом!',
+                        'Класна гра!',
+                        'Я новий гравець'
+                    ];
+                    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                    addChatMessage(randomPlayer, randomMessage);
+                }
+            }, 10000);
+        }
+        
+        // ============================
+        // ІНІЦІАЛІЗАЦІЯ ПРИ ЗАВАНТАЖЕННІ
+        // ============================
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Гра завантажена!');
+            
+            // Встановлюємо домашній екран
+            showScreen('home-screen');
+            
+            // Автоматично відкриваємо чат
             setTimeout(() => {
-                document.getElementById('chat-window').classList.add('active');
-            }, 1000);
+                toggleChat();
+            }, 1500);
+            
+            // Ініціалізуємо підключення
+            setTimeout(initializeConnection, 1000);
+            
+            // Обробка натискання Enter в чаті
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendChatMessage();
+                }
+            });
+            
+            // Анімація кнопки Play
+            document.querySelector('.btn-play').addEventListener('click', function() {
+                this.style.transform = 'translateY(4px)';
+                this.style.boxShadow = '0 2px 0 #cca300';
+                
+                setTimeout(() => {
+                    this.style.transform = '';
+                    this.style.boxShadow = '0 6px 0 #cca300';
+                    
+                    if (!isConnected) {
+                        addChatMessage('SYSTEM', '⚠️ Для гри потрібне підключення до сервера', true);
+                    } else {
+                        addChatMessage('SYSTEM', '🎮 Пошук противників...', true);
+                        
+                        // Симуляція пошуку гри
+                        this.textContent = 'SEARCHING...';
+                        this.disabled = true;
+                        
+                        setTimeout(() => {
+                            this.textContent = 'PLAY';
+                            this.disabled = false;
+                            addChatMessage('SYSTEM', '❌ Противників не знайдено. Спробуйте пізніше.', true);
+                        }, 3000);
+                    }
+                }, 100);
+            });
             
             // Анімація аватара
             const avatar = document.querySelector('.avatar');
@@ -984,63 +1133,22 @@
                     }, 300);
                 }, 5000);
             }
-        });
-        
-        // Додаткові функції для чату
-        chatInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendChatMessage();
-            }
-        });
-        
-        // Кнопка Play
-        document.querySelector('.btn-play').addEventListener('click', function() {
-            this.style.transform = 'translateY(4px)';
-            this.style.boxShadow = '0 2px 0 #cca300';
             
+            // Додаємо тестові повідомлення
             setTimeout(() => {
-                this.style.transform = '';
-                this.style.boxShadow = '0 6px 0 #cca300';
-                addChatMessage('SYSTEM', '🎮 Пошук гри...', true);
-                
-                // Анімація пошуку
-                const originalText = this.textContent;
-                this.textContent = 'SEARCHING...';
-                this.disabled = true;
-                
-                setTimeout(() => {
-                    this.textContent = originalText;
-                    this.disabled = false;
-                    addChatMessage('SYSTEM', '❌ Гравців не знайдено. Спробуйте ще раз.', true);
-                }, 2000);
-            }, 100);
+                addChatMessage('SYSTEM', '👋 Ласкаво просимо до Brawl Stars 2018!', true);
+                addChatMessage('SYSTEM', '💬 Чат активний. Грайте та спілкуйтесь!', true);
+            }, 2000);
         });
         
-        // Тест підключення
-        window.testConnection = function() {
-            console.log('Тест підключення до:', SERVER_URL);
-            addChatMessage('SYSTEM', '🔍 Тест підключення...', true);
-            
-            if (socket.connected) {
-                addChatMessage('SYSTEM', '✅ З\'єднання активно', true);
-            } else {
-                addChatMessage('SYSTEM', '❌ Немає з\'єднання', true);
-            }
-        };
+        // Експортуємо функції для глобального використання
+        window.sendInviteTo = sendInviteTo;
+        window.sendChatMessage = sendChatMessage;
+        window.toggleChat = toggleChat;
+        window.toggleSocialPanel = toggleSocialPanel;
+        window.showScreen = showScreen;
         
-        // Автоматичний тест при завантаженні
-        setTimeout(window.testConnection, 2000);
-        
-        // Генератор випадкових трофеїв
-        setInterval(() => {
-            const trophiesElement = document.querySelector('.trophies');
-            if (trophiesElement) {
-                const currentTrophies = parseInt(trophiesElement.textContent.match(/\d+/)[0]) || 0;
-                const newTrophies = currentTrophies + Math.floor(Math.random() * 3);
-                trophiesElement.textContent = `🏆 ${newTrophies}`;
-            }
-        }, 10000);
+        console.log('🎮 Brawl Stars 2018 - Multiplayer версія завантажена!');
     </script>
-
 </body>
 </html>
